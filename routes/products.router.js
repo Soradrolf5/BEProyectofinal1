@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import ProductManager from '../controllers/ProductManager.js';
 
-let filePath = `../files/products.json`
+let filePath = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\products.json'
 const productsRouter =  Router()
 const pmanager = new ProductManager(`${filePath}`)
 
@@ -12,12 +12,11 @@ productsRouter.get('/', async (req,res)=>{
     productsRouter.get('/:pid', async (req,res)=>{
       const id = parseInt(req.params.pid);
 
-      const result = await pmanager.getProductById(id);
-    
-      if (result.status === "successful") {
-        res.send(result.value);
-      } else {
-        res.status(404).send(result.error);
+      try {
+        const result = await pmanager.getProductById(id);
+        res.send(result);
+      } catch (error) {
+        res.status(404).send(`Product with id ${id} not found`);
       }
         })
     

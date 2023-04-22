@@ -1,8 +1,9 @@
 import fs from 'fs'
 
+
 export default class ProductManager {
     constructor() {
-        this.path = '../files/products.json'
+        this.path = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\products.json'
         this.latestId = 1;
         this.products = []
     }
@@ -57,17 +58,21 @@ export default class ProductManager {
     }
 
     
-   
     async getProductById(id) {
+      try {
         const data = await fs.promises.readFile(this.path, 'utf-8'); 
         const products = JSON.parse(data);
         const product = products.find(product => product.id === id);
         if (product) {
-          return product;
-      } else {
+          return { status: 'successful', value: product };
+        } else {
           throw new Error(`Product with id ${id} not found`);
+        }
+      } catch (error) {
+        console.log(`ERROR getting product with id ${id}. Msg: ${error}`);
+        return { status: 'failed', error: `ERROR getting product with id ${id}. Msg: ${error}` };
       }
-    } 
+    }
 
     async updateProduct(productId, updateData) {
         const data = await fs.promises.readFile(this.path, 'utf-8');

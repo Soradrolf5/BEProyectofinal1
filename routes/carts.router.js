@@ -2,10 +2,10 @@ import {Router} from 'express'
 import CartManager from '../controllers/CartManager.js'
 import ProductManager from '../controllers/ProductManager.js'
 
-
+let filePath = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\carts.json'
 const cartsRouter = Router()
 const pmanager = new ProductManager()
-const cmanager = new CartManager()
+const cmanager = new CartManager(`${filePath}`)
 
 
 cartsRouter.post('/', async (req, res) => {
