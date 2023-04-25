@@ -2,7 +2,7 @@ import fs from 'fs'
 
 export default class CartManager {
     constructor() {
-        this.path= 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\carts.json'
+        this.path= './files/carts.json'
         this.latestId = 1
         this.carts = []
     }

@@ -3,7 +3,7 @@ import fs from 'fs'
 
 export default class ProductManager {
     constructor() {
-        this.path = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\products.json'
+        this.path = './files/products.json'
         this.latestId = 1;
         this.products = []
     }
@@ -11,39 +11,59 @@ export default class ProductManager {
  
 
 
-    async addProduct (newProduct) {
-        const { title, description, price, thumbnail, code, stock } = newProduct;
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-          console.log("Error: todos los campos son obligatorios");
-          return; 
-        }
-        const found = this.products.some(product => product.code === code);
-
-        if (found) {
-        
-        console.log(`Error: Ya existe un producto con el código ${code}`);
-        
+    async addProduct(newProduct) {
+      const { title, description, price, thumbnail, code, stock } = newProduct;
+    
+      if (!title || !description || !price || !thumbnail || !code || !stock) {
+        console.log("Error: todos los campos son obligatorios");
         return;
-        
+      }
+    
+      // Lee los productos existentes del archivo JSON
+      let existingProducts = [];
+      try {
+        const data = await fs.promises.readFile(this.path);
+        existingProducts = JSON.parse(data);
+      } catch (err) {
+        console.error(`Error al leer el archivo JSON: ${err}`);
+      }
+    
+      // Encuentra el ID más grande y establece el valor de latestId
+      let maxId = 0;
+      existingProducts.forEach(product => {
+        if (product.id > maxId) {
+          maxId = product.id;
         }
-
-    const newproduct = {
+      });
+      this.latestId = maxId + 1;
+    
+      // Verifica si ya existe un producto con el mismo código
+      const found = existingProducts.some((product) => product.code === code);
+    
+      if (found) {
+        console.log(`Error: Ya existe un producto con el código ${code}`);
+        return;
+      }
+    
+      // Agrega el nuevo producto a los productos existentes
+      const newproduct = {
         title: title,
         description: description,
         price: price,
         thumbnail: thumbnail,
         code: code,
         stock: stock,
-        id: ++ this.latestId //arreglado el problema del id que debe de ser único y buscar por ID
-    }
-
-    this.products.push (newproduct);
-    console.log("Producto agregado con éxito");
-       await fs.writeFile(this.path, JSON.stringify(this.products), (err) => {
-            if (err) throw err;
-            console.log('Archivo guardado con éxito');
-        });
-        
+        id: this.latestId
+      };
+      existingProducts.push(newproduct);
+    
+      // Escribe todos los productos en el archivo JSON
+      try {
+        await fs.promises.writeFile(this.path, JSON.stringify(existingProducts));
+        console.log("Producto agregado con éxito");
+      } catch (err) {
+        console.error(`Error al escribir en el archivo JSON: ${err}`);
+      }
     }
     async getProducts() {
         try {
