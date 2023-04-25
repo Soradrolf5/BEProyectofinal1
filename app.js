@@ -35,7 +35,7 @@ app.set("views", path.resolve(__dirname + "/views"));
 app.use("/", express.static(__dirname + "/public"));
 
 // Eventos socket.io
-io.on('connection', socket => { // usa la variable io en lugar de socketServer
+io.on('connection', socket => { 
     console.log("New connection started");
 
     socket.emit('productsList', productsList);
