@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import ProductManager from '../controllers/ProductManager.js';
 
-let filePath = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\products.json'
+let filePath = './files/products.json'
 const productsRouter =  Router()
 const pmanager = new ProductManager(`${filePath}`)
 
