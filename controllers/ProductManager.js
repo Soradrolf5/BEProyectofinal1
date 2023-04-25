@@ -15,8 +15,7 @@ export default class ProductManager {
       const { title, description, price, thumbnail, code, stock } = newProduct;
     
       if (!title || !description || !price || !thumbnail || !code || !stock) {
-        console.log("Error: todos los campos son obligatorios");
-        return;
+        throw new Error("Error: todos los campos son obligatorios");
       }
     
       // Lee los productos existentes del archivo JSON
@@ -26,6 +25,7 @@ export default class ProductManager {
         existingProducts = JSON.parse(data);
       } catch (err) {
         console.error(`Error al leer el archivo JSON: ${err}`);
+        throw err; // re-lanzamos la excepción para que sea capturada en el controlador de la ruta
       }
     
       // Encuentra el ID más grande y establece el valor de latestId
@@ -41,8 +41,7 @@ export default class ProductManager {
       const found = existingProducts.some((product) => product.code === code);
     
       if (found) {
-        console.log(`Error: Ya existe un producto con el código ${code}`);
-        return;
+        throw new Error(`Error: Ya existe un producto con el código ${code}`); // lanzamos la excepción indicando que el producto ya existe
       }
     
       // Agrega el nuevo producto a los productos existentes
@@ -63,6 +62,7 @@ export default class ProductManager {
         console.log("Producto agregado con éxito");
       } catch (err) {
         console.error(`Error al escribir en el archivo JSON: ${err}`);
+        throw err; // re-lanzamos la excepción para que sea capturada en el controlador de la ruta
       }
     }
     async getProducts() {

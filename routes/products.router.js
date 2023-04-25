@@ -20,10 +20,15 @@ productsRouter.get('/', async (req,res)=>{
       }
         })
     
-        productsRouter.post('/', async (req, res)  => {
+        productsRouter.post('/', async (req, res) => {
           const newProduct = req.body;
-          await pmanager.addProduct(newProduct);
-          res.status(201).send('Producto agregado con éxito');
+          try {
+            await pmanager.addProduct(newProduct);
+            res.status(201).send('Producto agregado con éxito');
+          } catch (error) {
+            console.error(error);
+            res.status(400).send(error.message);
+          }
         })
     productsRouter.put('/:pid?', async (req, res) => {
       const productId = parseInt(req.params.pid);

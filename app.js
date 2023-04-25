@@ -1,42 +1,47 @@
 import express from 'express'
 import productsRouter from './routes/products.router.js'
 import cartsRouter from './routes/carts.router.js'
+import viewsRouter from './routes/views.router.js'
 import {engine} from "express-handlebars"
 import __dirname from "./utils.js"
 import * as path from "path"
+import { Server } from 'socket.io';
 import ProductManager from './controllers/ProductManager.js'
 
-let filePath = 'C:\\Users\\Admin\\Desktop\\BEProyectofinal1\\files\\products.json'
-const pmanager = new ProductManager(`${filePath}`)
 
-const app = express()
-const PORT = 8080
+let filePath = './files/products.json';
+const pmanager = new ProductManager(`${filePath}`);
+let productsList = pmanager.products;
+
+const app = express();
+const PORT = 8080;
+const server = app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
+});
+
+const io = new Server(server); // crea el servidor de sockets
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}))
-
+app.use(express.urlencoded({extended:true}));
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/', viewsRouter)
 //estructura handlebars
-app.engine("handlebars", engine())
-app.set("view engine", "handlebars")
-app.set("views", path.resolve(__dirname + "/views"))
-
-
-
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", path.resolve(__dirname + "/views"));
 
 //archivos estaticos
-app.use("/", express.static(__dirname + "/public") )
+app.use("/", express.static(__dirname + "/public"));
 
-app.get("/", async (req,res) =>  {
-    let allProducts = await pmanager.getProducts()
-    res.render("home",   {
-        title:"Productos",
-        products: allProducts
-    })
-})
+// Eventos socket.io
+io.on('connection', socket => { // usa la variable io en lugar de socketServer
+    console.log("New connection started");
 
-app.use('/api/products', productsRouter)
-app.use('/api/carts', cartsRouter)
+    socket.emit('productsList', productsList);
 
-app.listen(PORT, () => {
-    console.log(`Escuchando en puerto ${PORT}`)
-})
+    socket.on('addProduct', () => {
+        io.sockets.emit('productsList', productsList);
+    });
+
+});
